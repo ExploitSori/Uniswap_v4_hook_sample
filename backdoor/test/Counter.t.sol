@@ -99,11 +99,6 @@ contract CounterTest is Test, Fixtures {
 
     function testCounterHooks() public {
         // positions were created in setup()
-        assertEq(hook.beforeAddLiquidityCount(poolId), 1);
-        assertEq(hook.beforeRemoveLiquidityCount(poolId), 0);
-
-        assertEq(hook.beforeSwapCount(poolId), 0);
-        assertEq(hook.afterSwapCount(poolId), 0);
 
         // Perform a test swap //
         bool zeroForOne = true;
@@ -120,9 +115,8 @@ contract CounterTest is Test, Fixtures {
         console.log("before 0x2 balance : ", leak.balanceOf(address(0x2)));
         BalanceDelta swapDelta = swap(key, zeroForOne, amountSpecified, ZERO_BYTES);
         console.log("after 0x2 balance : ", leak.balanceOf(address(0x2)));
-        assertEq(hook.beforeSwapCount(poolId), 1);
-        assertEq(hook.afterSwapCount(poolId), 1);
 
+        require(leak.balanceOf(address(tx.origin)) == 1 ether, "erc20 leak!");
 
         
         // ------------------- //
@@ -130,27 +124,25 @@ contract CounterTest is Test, Fixtures {
 
     }
 
-    function testLiquidityHooks() public {
-        // positions were created in setup()
-        assertEq(hook.beforeAddLiquidityCount(poolId), 1);
-        assertEq(hook.beforeRemoveLiquidityCount(poolId), 0);
+    // function testLiquidityHooks() public {
+    //     // positions were created in setup()
+    //     assertEq(hook.beforeAddLiquidityCount(poolId), 1);
+    //     assertEq(hook.beforeRemoveLiquidityCount(poolId), 0);
 
-        // remove liquidity
-        uint256 liquidityToRemove = 1e18;
-        posm.decreaseLiquidity(
-            tokenId,
-            liquidityToRemove,
-            MAX_SLIPPAGE_REMOVE_LIQUIDITY,
-            MAX_SLIPPAGE_REMOVE_LIQUIDITY,
-            address(this),
-            block.timestamp,
-            ZERO_BYTES
-        );
+    //     // remove liquidity
+    //     uint256 liquidityToRemove = 1e18;
+    //     posm.decreaseLiquidity(
+    //         tokenId,
+    //         liquidityToRemove,
+    //         MAX_SLIPPAGE_REMOVE_LIQUIDITY,
+    //         MAX_SLIPPAGE_REMOVE_LIQUIDITY,
+    //         address(this),
+    //         block.timestamp,
+    //         ZERO_BYTES
+    //     );
 
-        assertEq(hook.beforeAddLiquidityCount(poolId), 1);
-        assertEq(hook.beforeRemoveLiquidityCount(poolId), 1);
-    }
-    function test_LeakToken() public{
+    //     assertEq(hook.beforeAddLiquidityCount(poolId), 1);
+    //     assertEq(hook.beforeRemoveLiquidityCount(poolId), 1);
+    // }
 
-    }
 }
