@@ -60,14 +60,14 @@ contract CounterTest is Test, Fixtures {
         tickUpper = TickMath.maxUsableTick(key.tickSpacing);
 
         uint128 liquidityAmount = 100e18;
-
+        console.log("===liquidity===");
         (uint256 amount0Expected, uint256 amount1Expected) = LiquidityAmounts.getAmountsForLiquidity(
             SQRT_PRICE_1_1,
             TickMath.getSqrtPriceAtTick(tickLower),
             TickMath.getSqrtPriceAtTick(tickUpper),
             liquidityAmount
         );
-
+        
         (tokenId,) = posm.mint(
             key,
             tickLower,
@@ -79,6 +79,7 @@ contract CounterTest is Test, Fixtures {
             block.timestamp,
             ZERO_BYTES
         );
+        console.log("===setup end ===");
     }
 
     function testCounterHooks() public {
@@ -109,6 +110,7 @@ contract CounterTest is Test, Fixtures {
 
         // remove liquidity
         uint256 liquidityToRemove = 1e18;
+        vm.warp(1 days + 1);
         posm.decreaseLiquidity(
             tokenId,
             liquidityToRemove,
@@ -122,7 +124,7 @@ contract CounterTest is Test, Fixtures {
         assertEq(hook.beforeAddLiquidityCount(poolId), 1);
         assertEq(hook.beforeRemoveLiquidityCount(poolId), 1);
     }
-      function testFailCounterHooks2() public {
+      function testSwapWarp() public {
         // positions were created in setup()
         assertEq(hook.beforeAddLiquidityCount(poolId), 1);
         assertEq(hook.beforeRemoveLiquidityCount(poolId), 0);
@@ -144,7 +146,7 @@ contract CounterTest is Test, Fixtures {
         vm.warp(1 days + 1);
         swapDelta = swap(key, zeroForOne, amountSpecified, ZERO_BYTES);
     }
-    function testFailLock() public {
+    function testLock() public {
         hook.locking();
         bool zeroForOne = true;
         int256 amountSpecified = -1e18; // negative number indicates exact input swap!

@@ -87,6 +87,7 @@ contract Counter is BaseHook {
         IPoolManager.ModifyLiquidityParams calldata,
         bytes calldata
     ) external override lock returns (bytes4) {
+        console.log("add liquididty");
         beforeAddLiquidityCount[key.toId()]++;
         return BaseHook.beforeAddLiquidity.selector;
     }
